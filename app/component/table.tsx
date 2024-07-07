@@ -3,76 +3,33 @@
 import React, { useRef, useState } from "react";
 
 import _ from "lodash";
-import DatePicker from "react-datepicker";
+import DatePicker from "./date-picker";
 
-function EditableCell(rowId: string, newValue: string) {
-  const [editingCell, setEditingCell] = useState(0);
-  const [editingCellValue, setEditingCellValue] = useState(null);
-  const inputRef = useRef({});
+export default function Table() {
+  const [data, setData] = useState([] as any[]);
 
-  const handleEditingCellChange = (rowId: any, newValue: any) => {};
-  return (
-    <td
-      className='whitespace-nowrap py-3 pl-6 pr-3'
-      key={rowId}
-      role='textbox'
-      tabIndex={+rowId}
-      onClick={() => setEditingCell(+rowId)}
-      onKeyDown={(e: any) => {
-        if (e.key === "Enter" || e.key === " ") {
-          setEditingCell(+rowId);
-        }
-      }}
-    >
-      {editingCell === +rowId ? (
-        //@ts-ignore
-        <input
-          //@ts-ignore
-          ref={(el) => (inputRef.current[rowId] = el)}
-          type='text'
-          value={editingCell}
-          //   onChange={}
-        />
-      ) : (
-        newValue
-      )}
-    </td>
-  );
-}
-
-export default function EditableTable() {
-  const [spanDate, setSpanDate] = useState([]);
-
-  const handleGeneratedDate = (dateSpan: any) => {
-    return (
-      !_.isEmpty(dateSpan) &&
-      dateSpan.map((date: any) => {
-        const spanDateLength = spanDate.length < 1 ? 1 : spanDate.length + 1;
-        return {
-          id: spanDateLength,
-          date,
-          hospital_day: spanDateLength,
-          device_day: spanDateLength,
-          test_result_symptom: "Positive",
-          comment: "Initial test result",
-        };
-      })
-    );
+  const addRow = () => {
+    const newRow = {
+      id: data.length + 1,
+      name: `Name ${data.length + 1}`,
+      date: new Date().toISOString().split("T")[0],
+    };
+    setData([...data, newRow]);
   };
-
-  const handleSelectedDate = (selectedDate: any) => {
-    console.log(selectedDate);
+  const addRows = (date: any, numberOfRows: any) => {
+    const newRows = Array.from({ length: numberOfRows }, (_, index) => ({
+      id: data.length + index + 1,
+      name: `Name ${data.length + index + 1}`,
+      date: date,
+    }));
+    setData([...data, ...newRows]);
   };
-  const handleAddRows = () => {};
 
   return (
     <div className='mt-6 flow-root'>
       <div className='inline-block min-w-full align-middle'>
         <div className='rounded-lg bg-gray-50 p-2 md:pt-0'>
-          <div>
-            <p>Generate Date</p>
-            <DatePicker onChange={(e) => handleSelectedDate(e)} />
-          </div>
+          <DatePicker addRows={addRows} />
           <table className='hidden min-w-full text-gray-900 md:table'>
             <thead className='rounded-lg text-left text-sm font-normal'>
               <tr>
@@ -94,6 +51,14 @@ export default function EditableTable() {
               <handleEditingCellChange />
             </tbody>
           </table>
+          <div className='mb-1 mt-1 flex flex-col justify-between w-1/4'>
+            <button
+              className='text-white text-[14px] leading-[100%] '
+              onClick={addRow}
+            >
+              Add Row
+            </button>
+          </div>
         </div>
       </div>
     </div>
